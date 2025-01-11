@@ -1,0 +1,126 @@
+networks:
+  server_net:
+    driver: bridge
+    ipam:
+      config:
+      - gateway: 10.100.0.254
+        subnet: 10.100.0.0/24
+    name: server_net
+
+services:
+  api-gateway:
+    build: ./api-gateway
+    image: api-gateway
+    container_name: api-gateway
+    restart: always
+    ports:
+      - "3000:3000"
+    depends_on:
+      - usuarios
+      - eventos
+      - reservas
+    networks:
+      server_net:
+        ipv4_address: 10.100.0.11
+      
+  eventos:
+    build: ./microservicios/eventos
+    image: eventos-microservice
+    container_name: eventos-microservicios
+    restart: always
+    ports:
+      - "3001:3001"
+    depends_on:
+      - mongo
+    networks:
+      server_net:
+        ipv4_address: 10.100.0.12
+
+  mongo:
+    image: mongo
+    restart: always
+    container_name: bd_eventos
+    ports:
+      - "27020:27017"
+    volumes:
+      - ./volumenes_db/mongo_data:/data/db
+    networks:
+      server_net:
+        ipv4_address: 10.100.0.15
+
+  usuarios:
+    build: ./microservicios/usuarios
+    image: usuarios-microservice
+    container_name: usuarios-microservicios
+    restart: always
+    ports:
+      - "3002:3002"
+    depends_on:
+      - db
+    networks:
+      server_net:
+        ipv4_address: 10.100.0.13
+  
+  db:
+    image: postgres
+    restart: always
+    container_name: bd_usuarios
+    environment:
+      POSTGRES_PASSWORD: password123
+      POSTGRES_USER: user123
+      POSTGRES_DB: db_user
+    volumes:
+      - ./volumenes_db/postgres_data:/var/lib/postgresql/data
+    networks:
+      server_net:
+        ipv4_address: 10.100.0.16
+
+  reservas:
+    build: ./microservicios/reservas
+    image: reservas-microservice
+    container_name: reservas-microservicios
+    restart: always
+    ports:
+      - "3004:3004"
+    depends_on:
+      - mariadb
+    networks:
+      server_net:
+        ipv4_address: 10.100.0.14
+  
+  mariadb:
+    image: mariadb:10.4
+    container_name:  bd_reservas
+    environment:
+      MYSQL_USER: root
+      MYSQL_ROOT_PASSWORD: agr2024
+      MYSQL_DATABASE: reservas
+    ports:
+      - "3307:3306"  
+    volumes:
+      - maria_data:/var/lib/mysql  
+    networks:
+      server_net:
+        ipv4_address: 10.100.0.17
+  
+  server:
+    cap_add:
+    - NET_ADMIN
+    command: sh -c "ip route del default via 10.100.0.254 2>/dev/null || true && ip
+      route add default via 10.100.0.1 && apk update && apk add --no-cache git &&
+      npm install -g nodemon && adduser -D -s /bin/ash nodeuser && git clone https://github.com/1805Luis/AGR_frontend
+      /home/nodeuser/server && chown -R nodeuser:nodeuser /home/nodeuser/server &&
+      su -s /bin/ash nodeuser -c 'cd /home/nodeuser/server && npm install && node
+      /home/nodeuser/server/server.js'"
+    container_name: server
+    image: node:alpine
+    networks:
+      server_net:
+        ipv4_address: 10.100.0.10
+    ports:
+    - 3000:3000
+
+volumes:
+  mongo_data:
+  postgres_data:
+  maria_data:
