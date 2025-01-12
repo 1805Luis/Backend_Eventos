@@ -9,6 +9,9 @@ router.get('/reservas', reservasController.getAllReservas);
 // Obtener una reserva por ID
 router.get('/reservas/:id', reservasController.getReservaById);
 
+// Obtener reservas por DNI
+router.get('/reservas/dni/:dni', reservasController.getReservasByDni);
+
 // Crear una nueva reserva
 router.post('/reservas', reservasController.createReserva);
 

@@ -2,7 +2,7 @@ const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 
 const app = express();
-const port = 3000;  // Puerto del API Gateway
+const port = 3010;  // Puerto del API Gateway
 
 app.get("/health", (req, res) => {
   res.status(200).send("API Gateway is up and running!");

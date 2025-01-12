@@ -27,6 +27,20 @@ const getReservaById = async (req, res) => {
     }
 };
 
+// Obtener reservas por DNI
+const getReservasByDni = async (req, res) => {
+    const dni = req.params.dni; // Obtener el DNI del parámetro de la URL
+    try {
+        const reservas = await Reserva.findByDni(dni); // Filtrar reservas por id_usuario (DNI)
+        if (!reservas || reservas.length === 0) {
+            return res.status(404).json({ message: 'No se encontraron reservas para este DNI' });
+        }
+        res.status(200).json(reservas);
+    } catch (error) {
+        res.status(500).json({ message: 'Error al obtener las reservas', error });
+    }
+};
+
 // Crear una nueva reserva
 const createReserva = async (req, res) => {
     const { id_evento, id_usuario, entradas } = req.body;
@@ -81,5 +95,6 @@ module.exports = {
     getReservaById,
     createReserva,
     updateReserva,
-    deleteReserva
+    deleteReserva,
+    getReservasByDni
 };
