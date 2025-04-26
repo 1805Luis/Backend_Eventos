@@ -37,7 +37,9 @@ El archivo `docker-compose.yml` define la infraestructura de la siguiente manera
 Se utiliza una red personalizada `server_net` con la siguiente configuración de direcciones IP:
 
 ## Instrucciones para Levantar el Proyecto
-1.Asegúrate de tener Docker y Docker Compose instalados.
-2.Clona este repositorio.
-3.En la raíz del proyecto, ejecuta: docker-compose up --build
+
+1. Asegúrate de tener Docker y Docker Compose instalados.
+2. Clona este repositorio.
+3. En la raíz del proyecto, ejecuta: `docker-compose up --build`
+
 
